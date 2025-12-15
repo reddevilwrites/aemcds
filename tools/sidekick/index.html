@@ -104,7 +104,7 @@
 <body>
 
     <div>
-        <h2>Architect Assistant</h2>
+        <h2>EDS Author Assistant</h2>
         <p>Describe the block you need (e.g., "Hero with 2 columns")</p>
     </div>
 
@@ -129,80 +129,129 @@
 
         // MOCK DATA: Simulating the GenAI response for the boilerplate
         // In the real version, this function will call your App Builder Action
-        const generateMockTable = (query) => {
-            const q = query.toLowerCase();
+        // const generateMockTable = (query) => {
+        //     const q = query.toLowerCase();
             
-            if (q.includes('hero')) {
-                return `
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th colspan="2">Hero</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><img src="https://via.placeholder.com/300" alt="Placeholder"></td>
-                            <td>
-                                <h1>Hero Headline</h1>
-                                <p>This is the description text.</p>
-                                <p><strong><a href="#">Call to Action</a></strong></p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>`;
-            } else if (q.includes('cards')) {
-                return `
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>Cards (3-up)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <img src="https://via.placeholder.com/150" alt="Card 1"><br>
-                                <h3>Card Title 1</h3>
-                                <p>Description text here.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <img src="https://via.placeholder.com/150" alt="Card 2"><br>
-                                <h3>Card Title 2</h3>
-                                <p>Description text here.</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>`;
-            } else {
-                return `<p style="color:red; padding:10px;">I didn't recognize that block. Try typing "hero" or "cards".</p>`;
+        //     if (q.includes('hero')) {
+        //         return `
+        //         <table border="1">
+        //             <thead>
+        //                 <tr>
+        //                     <th colspan="2">Hero</th>
+        //                 </tr>
+        //             </thead>
+        //             <tbody>
+        //                 <tr>
+        //                     <td><img src="https://via.placeholder.com/300" alt="Placeholder"></td>
+        //                     <td>
+        //                         <h1>Hero Headline</h1>
+        //                         <p>This is the description text.</p>
+        //                         <p><strong><a href="#">Call to Action</a></strong></p>
+        //                     </td>
+        //                 </tr>
+        //             </tbody>
+        //         </table>`;
+        //     } else if (q.includes('cards')) {
+        //         return `
+        //         <table border="1">
+        //             <thead>
+        //                 <tr>
+        //                     <th>Cards (3-up)</th>
+        //                 </tr>
+        //             </thead>
+        //             <tbody>
+        //                 <tr>
+        //                     <td>
+        //                         <img src="https://via.placeholder.com/150" alt="Card 1"><br>
+        //                         <h3>Card Title 1</h3>
+        //                         <p>Description text here.</p>
+        //                     </td>
+        //                 </tr>
+        //                 <tr>
+        //                     <td>
+        //                         <img src="https://via.placeholder.com/150" alt="Card 2"><br>
+        //                         <h3>Card Title 2</h3>
+        //                         <p>Description text here.</p>
+        //                     </td>
+        //                 </tr>
+        //             </tbody>
+        //         </table>`;
+        //     } else {
+        //         return `<p style="color:red; padding:10px;">I didn't recognize that block. Try typing "hero" or "cards".</p>`;
+        //     }
+        // };
+
+        // // EVENT: Generate Button Click
+        // btnGenerate.addEventListener('click', () => {
+        //     const query = promptInput.value;
+        //     if (!query) return;
+
+        //     btnGenerate.innerText = "Generating...";
+        //     btnGenerate.disabled = true;
+
+        //     // Simulate API delay
+        //     setTimeout(() => {
+        //         const html = generateMockTable(query);
+        //         preview.innerHTML = html;
+                
+        //         // Reset UI
+        //         btnGenerate.innerText = "Generate Block Structure";
+        //         btnGenerate.disabled = false;
+                
+        //         // Enable Copy if valid table exists
+        //         if(html.includes('<table')) {
+        //             btnCopy.disabled = false;
+        //         }
+        //     }, 800);
+        // });
+
+        
+        // REAL DATA: Call local Node server
+        const generateTableFromAI = async (query) => {
+            try {
+                const response = await fetch('http://localhost:4000/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: query })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                return data.html; // The AI generated HTML table
+
+            } catch (error) {
+                console.error("Error:", error);
+                return `<p style="color:red">Connection failed. Is your local node server running on port 4000?</p>`;
             }
         };
 
         // EVENT: Generate Button Click
-        btnGenerate.addEventListener('click', () => {
+        btnGenerate.addEventListener('click', async () => {
             const query = promptInput.value;
             if (!query) return;
 
-            btnGenerate.innerText = "Generating...";
+            btnGenerate.innerText = "Consulting AI..."; // Update text
             btnGenerate.disabled = true;
 
-            // Simulate API delay
-            setTimeout(() => {
-                const html = generateMockTable(query);
-                preview.innerHTML = html;
-                
-                // Reset UI
-                btnGenerate.innerText = "Generate Block Structure";
-                btnGenerate.disabled = false;
-                
-                // Enable Copy if valid table exists
-                if(html.includes('<table')) {
-                    btnCopy.disabled = false;
-                }
-            }, 800);
+            // Call the AI
+            const html = await generateTableFromAI(query);
+            
+            preview.innerHTML = html;
+            
+            // Reset UI
+            btnGenerate.innerText = "Generate Block Structure";
+            btnGenerate.disabled = false;
+            
+            // Enable Copy if valid table exists
+            if(html.includes('<table')) {
+                btnCopy.disabled = false;
+            }
         });
 
         // EVENT: Copy Button Click (The Critical Logic)
