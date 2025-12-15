@@ -1,12 +1,13 @@
 {
-  "project": "Boilerplate with Library",
+  "project": "EDS Author Assistant",
   "plugins": [
     {
-      "id": "library",
-      "title": "Library",
-      "environments": [ "edit" ],
-      "url": "/tools/sidekick/library.html",
-      "includePaths": [ "**.docx**" ]
+      "id": "architect-assistant",
+      "title": "EDS Author Assistant",
+      "url": "javascript:alert('Hello! The Assistant is ready to build.')",
+      "environments": ["preview", "live", "edit"],
+      "exclude_paths": [],
+      "include_path" : ["**.docx**"]
     }
   ]
 }
