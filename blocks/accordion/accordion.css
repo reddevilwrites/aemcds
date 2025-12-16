@@ -1,49 +1,61 @@
-/* Main Container */
+/* 1. Main Block Reset */
 .accordion {
-  border-top: 1px solid #ccc;
   width: 100%;
-  box-sizing: border-box; /* Ensures padding doesn't break layout */
+  border-top: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
-/* Individual Accordion Item */
+/* 2. Item Container */
 .accordion details {
   border-bottom: 1px solid #ccc;
   margin: 0;
+  /* SAFETY FIX: Ensure the container itself allows normal flow */
+  white-space: normal; 
 }
 
-/* --------------------------------------------------------------
-   HEADER (Summary) 
-   - Forces text to 1 line.
-   - Adds "..." if text is too long.
-   -------------------------------------------------------------- */
+/* 3. HEADER (Summary) - STRICT TRUNCATION */
 .accordion details summary {
-  padding: 1rem 3rem 1rem 0; /* Extra right padding for the icon */
-  cursor: pointer;
-  list-style: none; /* Hides default browser triangle */
-  position: relative;
+  padding: 1rem 3rem 1rem 0;
   font-weight: 600;
-  font-size: 1.1rem;
+  cursor: pointer;
+  position: relative;
+  list-style: none;
   
-  /* TRUNCATION LOGIC */
-  white-space: nowrap;       /* Force single line */
-  overflow: hidden;          /* Hide overflow */
-  text-overflow: ellipsis;   /* Add "..." at the end */
-  display: block;            /* Ensures standard box model behavior */
+  /* FORCE SINGLE LINE (Truncation) */
+  display: block;          /* Vital for text-overflow to work */
+  width: 100%;             /* Ensure it takes full width */
+  white-space: nowrap;     /* Force text to one line */
+  overflow: hidden;        /* Hide the rest */
+  text-overflow: ellipsis; /* Add "..." */
 }
 
-/* Hide default marker specifically for Chrome/Safari */
+/* Chrome/Safari marker fix */
 .accordion details summary::-webkit-details-marker {
   display: none;
 }
 
-/* --------------------------------------------------------------
-   ICON (Chevron)
-   - Uses CSS borders to create a clean arrow.
-   -------------------------------------------------------------- */
+/* 4. CONTENT BODY - STRICT WRAPPING (The Fix) */
+/* We target the div immediately following the summary */
+.accordion details summary + div,
+.accordion details summary + p {
+  padding: 1rem 0;
+  color: #555;
+  line-height: 1.6;
+
+  /* FORCE MULTI-LINE (Wrapping) */
+  /* This overrides any parent 'nowrap' rules */
+  white-space: normal !important; 
+  overflow: visible !important;
+  text-overflow: clip !important;
+  height: auto !important;
+  width: 100%;
+}
+
+/* 5. Chevron Icon */
 .accordion details summary::after {
   content: '';
   position: absolute;
-  right: 1rem; /* Positioning from the right edge */
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
   width: 8px;
@@ -53,24 +65,6 @@
   transition: transform 0.2s ease;
 }
 
-/* Rotate the icon when the accordion is OPEN */
 .accordion details[open] summary::after {
   transform: translateY(-50%) rotate(225deg);
-}
-
-/* --------------------------------------------------------------
-   CONTENT BODY 
-   - CRITICAL FIX: Resets text behavior to allow wrapping.
-   -------------------------------------------------------------- */
-.accordion details > div,
-.accordion details > p {
-  padding: 1rem 0 1.5rem 0; /* Add bottom padding for breathing room */
-  color: #555;
-  line-height: 1.6;
-  
-  /* RESET TEXT WRAPPING */
-  /* This ensures the body text wraps normally even if the header doesn't */
-  white-space: normal !important; 
-  overflow: visible !important;
-  text-overflow: clip;
 }
