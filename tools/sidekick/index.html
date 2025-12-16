@@ -216,7 +216,7 @@
         // REAL DATA: Call local Node server
         const generateTableFromAI = async (query) => {
             try {
-                const response = await fetch('http://localhost:4000/generate', {
+                const response = await fetch('https://hulking-zoie-revisional.ngrok-free.dev/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
