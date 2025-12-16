@@ -103,6 +103,27 @@
             transition: opacity 0.3s; 
             font-weight: 500;
         }
+
+        .upload-area {
+        border: 2px dashed #555;
+        border-radius: 6px;
+        padding: 15px;
+        text-align: center;
+        background-color: var(--input-bg);
+        cursor: pointer;
+        transition: border-color 0.2s;
+        }
+        .upload-area:hover { border-color: var(--accent-color); }
+        .upload-area p { margin: 0; font-size: 13px; color: #aaa; pointer-events: none;}
+        .upload-area span { color: var(--accent-color); font-weight: bold; }
+        
+        #image-preview img {
+            max-width: 100%;
+            max-height: 100px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #555;
+        }
     </style>
 </head>
 <body>
@@ -113,6 +134,11 @@
     </div>
 
     <textarea id="prompt-input" placeholder="e.g., Accordion with 3 questions about return policy..."></textarea>
+    <div class="upload-area" id="drop-zone">
+        <p>📷 Drag screenshot here or <span>click to upload</span></p>
+        <input type="file" id="file-input" accept="image/*" style="display:none">
+        <div id="image-preview"></div>
+    </div>
     
     <button id="btn-generate">Generate Block</button>
 
@@ -202,6 +228,95 @@
                 setTimeout(() => { statusMsg.style.opacity = 0; }, 2000);
             } catch (e) {
                 alert("Clipboard copy failed. Please select the table manually and copy.");
+            }
+        });
+
+        /* -----------------------------------------------------------
+           IMAGE HANDLING
+           ----------------------------------------------------------- */
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const imagePreview = document.getElementById('image-preview');
+        let currentBase64Image = null; // Store the image here
+
+        // Click to upload
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // File Selection
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        // Drag & Drop Support
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#3483FA';
+        });
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#555';
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#555';
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentBase64Image = e.target.result;
+                // Show preview
+                imagePreview.innerHTML = `<img src="${currentBase64Image}">`;
+                dropZone.querySelector('p').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /* -----------------------------------------------------------
+           UPDATED GENERATE FUNCTION
+           ----------------------------------------------------------- */
+        btnGenerate.addEventListener('click', async () => {
+            const query = promptInput.value;
+            // Allow empty text prompt IF an image is provided
+            if (!query && !currentBase64Image) {
+                alert("Please enter text or upload an image.");
+                return;
+            }
+
+            btnGenerate.innerText = "Analyzing...";
+            btnGenerate.disabled = true;
+            preview.style.opacity = "0.5";
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        prompt: query,
+                        image: currentBase64Image // Send the image!
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+                
+                preview.innerHTML = data.html;
+                if(data.html.includes('<table')) btnCopy.disabled = false;
+
+                // Clear image after success (optional)
+                // currentBase64Image = null; 
+                // imagePreview.innerHTML = '';
+                // dropZone.querySelector('p').style.display = 'block';
+
+            } catch (err) {
+                console.error(err);
+                preview.innerHTML = `<p style="color:#d32f2f;">${err.message}</p>`;
+            } finally {
+                btnGenerate.innerText = "Generate Block";
+                btnGenerate.disabled = false;
+                preview.style.opacity = "1";
             }
         });
     </script>
