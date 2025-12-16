@@ -207,15 +207,54 @@
             }
         });
 
-        /* -----------------------------------------------------------
-           COPY FUNCTION
+       /* -----------------------------------------------------------
+           ROBUST COPY FUNCTION (FIXED)
            ----------------------------------------------------------- */
         btnCopy.addEventListener('click', async () => {
             try {
-                // Clipboard API requires distinct blobs for HTML and Text
-                const blobHtml = new Blob([preview.innerHTML], { type: 'text/html' });
-                const blobText = new Blob([preview.innerText], { type: 'text/plain' });
+                // 1. Get the raw HTML from the preview
+                const rawHtml = preview.innerHTML;
                 
+                // 2. Create a temporary DOM element to manipulate the HTML safely
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = rawHtml;
+                
+                // 3. Find the table and force "Google Docs Friendly" attributes
+                const table = tempDiv.querySelector('table');
+                if (table) {
+                    // CRITICAL: Google Docs needs border="1" to recognize the grid
+                    table.setAttribute('border', '1');
+                    table.style.borderCollapse = 'collapse';
+                    table.style.width = '100%';
+                    
+                    // Force inline styles on all cells (survives copy-paste)
+                    const cells = table.querySelectorAll('th, td');
+                    cells.forEach(cell => {
+                        cell.style.border = '1px solid #000';
+                        cell.style.padding = '8px';
+                        cell.style.verticalAlign = 'top';
+                    });
+                }
+
+                // 4. Wrap in a full HTML document structure
+                // This tells the clipboard "This is a full rich document, not just a snippet"
+                const richHtml = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset='utf-8'>
+                    </head>
+                    <body>
+                        ${tempDiv.innerHTML}
+                    </body>
+                    </html>
+                `;
+
+                // 5. Create Blobs
+                const blobHtml = new Blob([richHtml], { type: 'text/html' });
+                const blobText = new Blob([tempDiv.innerText], { type: 'text/plain' });
+                
+                // 6. Write to Clipboard
                 await navigator.clipboard.write([ 
                     new ClipboardItem({ 
                         'text/html': blobHtml, 
@@ -225,12 +264,14 @@
 
                 // Success Animation
                 statusMsg.style.opacity = 1;
-                setTimeout(() => { statusMsg.style.opacity = 0; }, 2000);
+                statusMsg.innerText = "Table copied! Paste into Docs.";
+                setTimeout(() => { statusMsg.style.opacity = 0; }, 2500);
+
             } catch (e) {
-                alert("Clipboard copy failed. Please select the table manually and copy.");
+                console.error("Copy Error:", e);
+                alert("Clipboard copy failed. Please select the table manually and press Ctrl+C.");
             }
         });
-
         /* -----------------------------------------------------------
            IMAGE HANDLING
            ----------------------------------------------------------- */
