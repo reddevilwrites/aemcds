@@ -46,6 +46,13 @@
   transform: translateY(-50%) rotate(225deg);
 }
 
+.accordion details p, 
+.accordion details div { 
+  white-space: normal;       /* Allow text to wrap to new lines */
+  overflow: visible;         /* Ensure nothing is hidden */
+  text-overflow: clip;       /* Remove ellipsis from body text */
+}
+
 /* The Content Body */
 .accordion details > div {
   padding: 1rem 0;
