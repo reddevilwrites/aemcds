@@ -1,4 +1,4 @@
-/* 1. Main Block Reset */
+/* 1. Main Container */
 .accordion {
   width: 100%;
   border-top: 1px solid #ccc;
@@ -9,11 +9,9 @@
 .accordion details {
   border-bottom: 1px solid #ccc;
   margin: 0;
-  /* SAFETY FIX: Ensure the container itself allows normal flow */
-  white-space: normal; 
 }
 
-/* 3. HEADER (Summary) - STRICT TRUNCATION */
+/* 3. HEADER (Summary) */
 .accordion details summary {
   padding: 1rem 3rem 1rem 0;
   font-weight: 600;
@@ -21,34 +19,28 @@
   position: relative;
   list-style: none;
   
-  /* FORCE SINGLE LINE (Truncation) */
-  display: block;          /* Vital for text-overflow to work */
-  width: 100%;             /* Ensure it takes full width */
-  white-space: nowrap;     /* Force text to one line */
-  overflow: hidden;        /* Hide the rest */
-  text-overflow: ellipsis; /* Add "..." */
+  /* Keep header single line (Truncated) */
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Chrome/Safari marker fix */
+/* Remove default marker */
 .accordion details summary::-webkit-details-marker {
   display: none;
 }
 
-/* 4. CONTENT BODY - STRICT WRAPPING (The Fix) */
-/* We target the div immediately following the summary */
-.accordion details summary + div,
-.accordion details summary + p {
-  padding: 1rem 0;
+/* 4. CONTENT BODY (The Answer) */
+/* We target the new class specifically */
+.accordion .accordion-content {
+  padding: 1rem 0 1.5rem 0;
   color: #555;
   line-height: 1.6;
-
-  /* FORCE MULTI-LINE (Wrapping) */
-  /* This overrides any parent 'nowrap' rules */
-  white-space: normal !important; 
-  overflow: visible !important;
-  text-overflow: clip !important;
-  height: auto !important;
-  width: 100%;
+  
+  /* Ensure text wraps normally */
+  white-space: normal; 
+  overflow: visible;
 }
 
 /* 5. Chevron Icon */
