@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Launching Assistant...</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        button { background: #3483FA; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px;}
+        button:hover { background: #2c6ecb; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Architect Assistant</h2>
+        <p>Opening floating tool...</p>
+        <button id="btn-launch">Launch Now</button>
+    </div>
+
+    <script>
+        const launch = () => {
+            // 1. Define the Popup Specs (Size, Position, Toolbar hidden)
+            const specs = "width=400,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no";
+            
+            // 2. Open index.html in the popup
+            // Note: We use the relative path to your existing tool
+            const win = window.open('index.html', 'ArchAssistant', specs);
+
+            // 3. Attempt to close this launcher tab automatically
+            if (win) {
+                window.close();
+            }
+        };
+
+        // Try to launch automatically
+        launch();
+
+        // Fallback: If popup blocker stops it, let user click
+        document.getElementById('btn-launch').addEventListener('click', launch);
+    </script>
+</body>
+</html>

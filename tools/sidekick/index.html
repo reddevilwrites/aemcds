@@ -7,93 +7,38 @@
     <style>
         :root {
             --bg-color: #1e1e1e;
-            --panel-bg: #2b2b2b;
+            --input-bg: #2b2b2b;
             --text-color: #f5f5f5;
             --accent-color: #3483FA;
-            --border-color: #555;
+            --border-color: #444;
         }
 
-        /* 1. The Canvas (Background) */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #f0f0f0; /* Light grey so you can see the palette boundaries */
-            overflow: hidden; 
-        }
-
-        /* 2. The Floating Palette */
-        #palette {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 350px;  /* Default Width */
-            height: 500px; /* Default Height */
-            
-            /* RESIZABLE LOGIC */
-            resize: both;  /* Enables dragging the bottom-right corner */
-            overflow: auto; /* Required for resize to work */
-            min-width: 250px;
-            min-height: 300px;
-
-            /* Visuals */
             background-color: var(--bg-color);
             color: var(--text-color);
-            border: 1px solid #333;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-        }
-
-        /* 3. The Drag Handle (Header) */
-        .drag-handle {
-            padding: 12px 15px;
-            background-color: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
-            cursor: move; /* Shows the 'move' icon */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-            flex-shrink: 0; /* Prevent header from shrinking */
-        }
-
-        .drag-handle h2 {
             margin: 0;
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-        }
-
-        /* 4. Content Area */
-        .content-area {
             padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            flex-grow: 1; /* Fills remaining height */
+            gap: 15px;
+            height: 100vh;
+            box-sizing: border-box;
         }
 
-        /* Inputs */
+        h2 { margin: 0 0 5px 0; font-size: 16px; color: #fff; }
+        p.desc { margin: 0; font-size: 12px; color: #aaa; }
+
         textarea {
-            background-color: var(--panel-bg);
+            background-color: var(--input-bg);
             border: 1px solid var(--border-color);
             color: white;
             padding: 10px;
             border-radius: 4px;
-            resize: none; /* Disable textarea resize, resize the palette instead */
-            height: 70px;
+            resize: vertical;
+            min-height: 80px;
             font-family: inherit;
-            font-size: 13px;
-            width: 100%;
-            box-sizing: border-box;
         }
-
-        textarea:focus { outline: 1px solid var(--accent-color); }
 
         button {
             background-color: var(--accent-color);
@@ -103,169 +48,91 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
-            transition: opacity 0.2s;
-            width: 100%;
         }
+        button:disabled { background-color: #444; cursor: not-allowed; }
 
-        button:hover { opacity: 0.9; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; background-color: #555; }
-
-        /* Preview Area */
         .preview-container {
-            border: 1px solid var(--border-color);
-            background-color: white;
+            flex-grow: 1;
+            background: white;
             color: black;
-            padding: 10px;
             border-radius: 4px;
-            flex-grow: 1; /* Takes up available space */
-            overflow: auto; /* Internal scrolling */
-            font-size: 12px;
-            min-height: 100px;
+            padding: 10px;
+            overflow: auto;
+            border: 1px solid #ccc;
         }
 
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ccc; padding: 4px; vertical-align: top;}
-        th { background: #f4f4f4; font-weight: bold;}
+        table { border-collapse: collapse; width: 100%; font-size: 12px; }
+        th, td { border: 1px solid #999; padding: 4px; }
+        th { background: #eee; font-weight: bold; }
 
-        #status-msg { font-size: 11px; color: #4CAF50; text-align: center; opacity: 0; transition: opacity 0.5s; }
-
+        #status-msg { color: #4CAF50; font-size: 12px; text-align: center; opacity: 0; transition: opacity 0.3s; }
     </style>
 </head>
 <body>
 
-    <div id="palette">
-        
-        <div class="drag-handle" id="drag-header">
-            <h2>Architect Assistant</h2>
-            <span style="font-size:18px; color:#aaa;">⋮⋮</span>
-        </div>
-
-        <div class="content-area">
-            <p style="margin:0; font-size:11px; color:#aaa;">Describe your block below:</p>
-            
-            <textarea id="prompt-input" placeholder="E.g., 'Accordion with 3 questions about returns...'"></textarea>
-            
-            <button id="btn-generate">Generate Block</button>
-
-            <div class="preview-container">
-                <div id="block-preview">
-                    <p style="color:#666; font-style:italic; margin-top:10px; text-align:center;">Preview will appear here...</p>
-                </div>
-            </div>
-
-            <button id="btn-copy" disabled>Copy Table to Clipboard</button>
-            <div id="status-msg">Copied successfully!</div>
-        </div>
-
+    <div>
+        <h2>Architect Assistant</h2>
+        <p class="desc">Describe the block you need:</p>
     </div>
 
+    <textarea id="prompt-input" placeholder="e.g., Accordion with 3 items..."></textarea>
+    <button id="btn-generate">Generate Block</button>
+
+    <div class="preview-container">
+        <div id="block-preview"></div>
+    </div>
+
+    <button id="btn-copy" disabled>Copy Table</button>
+    <div id="status-msg">Copied! Paste into your document.</div>
+
     <script>
-        /* ------------------------------------------------------------
-           DRAGGABLE LOGIC (Fixed)
-           ------------------------------------------------------------ */
-        const palette = document.getElementById("palette");
-        const header = document.getElementById("drag-header");
+        // *** NGROK URL ***
+        const API_URL = 'https://hulking-zoie-revisional.ngrok-free.dev/generate'; 
 
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-
-        header.addEventListener("mousedown", (e) => {
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            
-            // Get current position
-            const rect = palette.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
-
-            // Prevent text selection while dragging
-            document.body.style.userSelect = "none";
-            header.style.cursor = "grabbing";
-        });
-
-        document.addEventListener("mousemove", (e) => {
-            if (!isDragging) return;
-
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-
-            palette.style.left = `${initialLeft + dx}px`;
-            palette.style.top = `${initialTop + dy}px`;
-        });
-
-        document.addEventListener("mouseup", () => {
-            isDragging = false;
-            document.body.style.userSelect = "auto";
-            header.style.cursor = "move";
-        });
-
-
-        /* ------------------------------------------------------------
-           APP LOGIC (With Updated Ngrok URL)
-           ------------------------------------------------------------ */
         const promptInput = document.getElementById('prompt-input');
         const btnGenerate = document.getElementById('btn-generate');
         const btnCopy = document.getElementById('btn-copy');
         const preview = document.getElementById('block-preview');
         const statusMsg = document.getElementById('status-msg');
 
-        // *** YOUR UPDATED NGROK URL ***
-        const API_URL = 'https://hulking-zoie-revisional.ngrok-free.dev/generate'; 
+        btnGenerate.addEventListener('click', async () => {
+            const query = promptInput.value;
+            if (!query) return;
 
-        const generateTableFromAI = async (query) => {
+            btnGenerate.innerText = "Thinking...";
+            btnGenerate.disabled = true;
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: query })
                 });
-
                 const data = await response.json();
+                
                 if (data.error) throw new Error(data.error);
-                return data.html;
+                
+                preview.innerHTML = data.html;
+                if(data.html.includes('<table')) btnCopy.disabled = false;
 
-            } catch (error) {
-                console.error("Error:", error);
-                return `<p style="color:red; font-size:11px; text-align:center; padding:20px;">
-                        <b>Connection Failed.</b><br><br>
-                        1. Is your Node server running?<br>
-                        2. Is ngrok running on port 4000?<br>
-                        3. Check console for CORS errors.
-                        </p>`;
+            } catch (err) {
+                console.error(err);
+                preview.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+            } finally {
+                btnGenerate.innerText = "Generate Block";
+                btnGenerate.disabled = false;
             }
-        };
-
-        btnGenerate.addEventListener('click', async () => {
-            const query = promptInput.value;
-            if (!query) return;
-
-            btnGenerate.innerText = "Generating...";
-            btnGenerate.disabled = true;
-
-            const html = await generateTableFromAI(query);
-            
-            preview.innerHTML = html;
-            btnGenerate.innerText = "Generate Block";
-            btnGenerate.disabled = false;
-            
-            if(html && html.includes('<table')) btnCopy.disabled = false;
         });
 
         btnCopy.addEventListener('click', async () => {
-            const htmlContent = preview.innerHTML;
             try {
-                const blob = new Blob([htmlContent], { type: 'text/html' });
-                const plainTextBlob = new Blob([preview.innerText], { type: 'text/plain' });
-                await navigator.clipboard.write([
-                    new ClipboardItem({ 'text/html': blob, 'text/plain': plainTextBlob })
-                ]);
+                const blob = new Blob([preview.innerHTML], { type: 'text/html' });
+                const txt = new Blob([preview.innerText], { type: 'text/plain' });
+                await navigator.clipboard.write([ new ClipboardItem({ 'text/html': blob, 'text/plain': txt }) ]);
                 statusMsg.style.opacity = 1;
                 setTimeout(() => { statusMsg.style.opacity = 0; }, 2000);
-            } catch (err) {
-                console.error('Copy failed', err);
-                alert("Clipboard copy failed. Please select manually.");
+            } catch (e) {
+                alert("Copy failed");
             }
         });
     </script>
