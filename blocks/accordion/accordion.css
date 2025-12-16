@@ -1,37 +1,49 @@
-/* Main Accordion Container */
+/* Main Container */
 .accordion {
   border-top: 1px solid #ccc;
   width: 100%;
+  box-sizing: border-box; /* Ensures padding doesn't break layout */
 }
 
-/* The Clickable Header (Summary) */
-.accordion details summary {
-  padding: 1rem 0;
+/* Individual Accordion Item */
+.accordion details {
   border-bottom: 1px solid #ccc;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------
+   HEADER (Summary) 
+   - Forces text to 1 line.
+   - Adds "..." if text is too long.
+   -------------------------------------------------------------- */
+.accordion details summary {
+  padding: 1rem 3rem 1rem 0; /* Extra right padding for the icon */
   cursor: pointer;
-  list-style: none; /* Hides default triangle in some browsers */
+  list-style: none; /* Hides default browser triangle */
   position: relative;
   font-weight: 600;
   font-size: 1.1rem;
-  padding-right: 2rem; /* Space for the icon */
-
-  /* NEW: Truncate text after 1 line */
-  white-space: nowrap;       /* Keep on one line */
+  
+  /* TRUNCATION LOGIC */
+  white-space: nowrap;       /* Force single line */
   overflow: hidden;          /* Hide overflow */
-  text-overflow: ellipsis;   /* Add "..." */
-  max-width: 100%;           /* Ensure it respects container */
+  text-overflow: ellipsis;   /* Add "..." at the end */
+  display: block;            /* Ensures standard box model behavior */
 }
 
-/* Hide default marker (standard fix) */
+/* Hide default marker specifically for Chrome/Safari */
 .accordion details summary::-webkit-details-marker {
   display: none;
 }
 
-/* The Chevron Icon (using CSS borders) */
+/* --------------------------------------------------------------
+   ICON (Chevron)
+   - Uses CSS borders to create a clean arrow.
+   -------------------------------------------------------------- */
 .accordion details summary::after {
   content: '';
   position: absolute;
-  right: 0.5rem;
+  right: 1rem; /* Positioning from the right edge */
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
   width: 8px;
@@ -41,16 +53,24 @@
   transition: transform 0.2s ease;
 }
 
-/* Rotate icon when open */
+/* Rotate the icon when the accordion is OPEN */
 .accordion details[open] summary::after {
   transform: translateY(-50%) rotate(225deg);
 }
 
-
-
-/* The Content Body */
-.accordion details > div {
-  padding: 1rem 0;
+/* --------------------------------------------------------------
+   CONTENT BODY 
+   - CRITICAL FIX: Resets text behavior to allow wrapping.
+   -------------------------------------------------------------- */
+.accordion details > div,
+.accordion details > p {
+  padding: 1rem 0 1.5rem 0; /* Add bottom padding for breathing room */
   color: #555;
   line-height: 1.6;
+  
+  /* RESET TEXT WRAPPING */
+  /* This ensures the body text wraps normally even if the header doesn't */
+  white-space: normal !important; 
+  overflow: visible !important;
+  text-overflow: clip;
 }
