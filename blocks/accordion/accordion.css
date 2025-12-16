@@ -14,6 +14,12 @@
   font-weight: 600;
   font-size: 1.1rem;
   padding-right: 2rem; /* Space for the icon */
+
+  /* NEW: Truncate text after 1 line */
+  white-space: nowrap;       /* Keep on one line */
+  overflow: hidden;          /* Hide overflow */
+  text-overflow: ellipsis;   /* Add "..." */
+  max-width: 100%;           /* Ensure it respects container */
 }
 
 /* Hide default marker (standard fix) */
