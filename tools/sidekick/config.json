@@ -6,6 +6,8 @@
       "title": "EDS Author Assistant",
       "url": "/tools/sidekick/index.html",
       "environments": ["preview", "live", "edit"],
+      "passConfig": true,
+      "passReferrer": true,
       "isPalette" : true,
       "exclude_paths": [],
       "include_path" : ["**.docx**"]
