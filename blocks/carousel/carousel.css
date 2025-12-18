@@ -1,0 +1,85 @@
+/* Base Carousel */
+.carousel {
+  position: relative;
+  max-width: 100%;
+}
+
+.carousel-wrapper {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  padding: 10px 40px; /* Space for buttons */
+}
+
+.carousel-wrapper::-webkit-scrollbar { 
+  display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+.carousel-slide {
+  flex: 0 0 160px; /* Fixed width per item */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.carousel-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Text Styling */
+.carousel-text p {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 10px;
+  line-height: 1.2;
+}
+
+/* Navigation Buttons */
+.carousel-nav {
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.carousel-nav.prev { left: 0; }
+.carousel-nav.next { right: 0; }
+.carousel-nav:hover { background: #f0f0f0; }
+
+/* =========================================
+   VARIANT: Circle (The Best Buy Style)
+   ========================================= */
+.carousel.circle .carousel-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%; /* Makes it round */
+  overflow: hidden;
+  background: #f4f4f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+}
+
+.carousel.circle .carousel-image img {
+  width: 80%; /* Inner image is slightly smaller like icon */
+  height: 80%;
+  object-fit: contain;
+}
