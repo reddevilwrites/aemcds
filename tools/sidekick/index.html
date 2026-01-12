@@ -180,15 +180,16 @@
             preview.style.opacity = "0.5";
 
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        prompt: query,
-                        image: currentBase64Image // Send the image!
-                    })
-                });
+                const payload = { prompt: query };
+                if (typeof currentBase64Image === 'string' && currentBase64Image.trim()) {
+                payload.image = currentBase64Image;
+                }
 
+                const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+                });
                 const data = await response.json();
                 
                 if (data.error) throw new Error(data.error);
