@@ -169,10 +169,13 @@
            ----------------------------------------------------------- */
         btnGenerate.addEventListener('click', async () => {
             const query = promptInput.value;
-            if (!query) return;
+            // Allow empty text prompt IF an image is provided
+            if (!query && !currentBase64Image) {
+                alert("Please enter text or upload an image.");
+                return;
+            }
 
-            // UI Feedback
-            btnGenerate.innerText = "Thinking...";
+            btnGenerate.innerText = "Analyzing...";
             btnGenerate.disabled = true;
             preview.style.opacity = "0.5";
 
@@ -180,32 +183,34 @@
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: query })
+                    body: JSON.stringify({ 
+                        prompt: query,
+                        image: currentBase64Image // Send the image!
+                    })
                 });
 
                 const data = await response.json();
                 
                 if (data.error) throw new Error(data.error);
                 
-                // Render Result
                 preview.innerHTML = data.html;
-                preview.style.opacity = "1";
-                
-                // Enable Copy Button if table exists
-                if(data.html && data.html.includes('<table')) {
-                    btnCopy.disabled = false;
-                }
+                if(data.html.includes('<table')) btnCopy.disabled = false;
+
+                // Clear image after success (optional)
+                // currentBase64Image = null; 
+                // imagePreview.innerHTML = '';
+                // dropZone.querySelector('p').style.display = 'block';
 
             } catch (err) {
                 console.error(err);
-                preview.innerHTML = `<p style="color:#d32f2f; font-weight:bold;">Error: ${err.message}</p>
-                                     <p style="font-size:12px;">Make sure your local server and ngrok are running.</p>`;
-                preview.style.opacity = "1";
+                preview.innerHTML = `<p style="color:#d32f2f;">${err.message}</p>`;
             } finally {
                 btnGenerate.innerText = "Generate Block";
                 btnGenerate.disabled = false;
+                preview.style.opacity = "1";
             }
         });
+
 
        /* -----------------------------------------------------------
            ROBUST COPY FUNCTION (FIXED)
@@ -313,53 +318,6 @@
             };
             reader.readAsDataURL(file);
         }
-
-        /* -----------------------------------------------------------
-           UPDATED GENERATE FUNCTION
-           ----------------------------------------------------------- */
-        btnGenerate.addEventListener('click', async () => {
-            const query = promptInput.value;
-            // Allow empty text prompt IF an image is provided
-            if (!query && !currentBase64Image) {
-                alert("Please enter text or upload an image.");
-                return;
-            }
-
-            btnGenerate.innerText = "Analyzing...";
-            btnGenerate.disabled = true;
-            preview.style.opacity = "0.5";
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        prompt: query,
-                        image: currentBase64Image // Send the image!
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.error) throw new Error(data.error);
-                
-                preview.innerHTML = data.html;
-                if(data.html.includes('<table')) btnCopy.disabled = false;
-
-                // Clear image after success (optional)
-                // currentBase64Image = null; 
-                // imagePreview.innerHTML = '';
-                // dropZone.querySelector('p').style.display = 'block';
-
-            } catch (err) {
-                console.error(err);
-                preview.innerHTML = `<p style="color:#d32f2f;">${err.message}</p>`;
-            } finally {
-                btnGenerate.innerText = "Generate Block";
-                btnGenerate.disabled = false;
-                preview.style.opacity = "1";
-            }
-        });
     </script>
 </body>
 </html>
