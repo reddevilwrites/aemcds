@@ -140,6 +140,7 @@
         <div id="image-preview"></div>
     </div>
     
+    <button id="btn-clear-image" style="display: none;">Clear</button>
     <button id="btn-generate">Generate Block</button>
 
     <div class="preview-container">
@@ -234,7 +235,7 @@
 
 
        /* -----------------------------------------------------------
-           ROBUST COPY FUNCTION (FIXED)
+           COPY FUNCTION
            ----------------------------------------------------------- */
         btnCopy.addEventListener('click', async () => {
             try {
@@ -304,6 +305,7 @@
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const imagePreview = document.getElementById('image-preview');
+        const clearImageBtn = document.getElementById('btn-clear-image');
         let currentBase64Image = null; // Store the image here
 
         // Click to upload
@@ -327,6 +329,11 @@
             handleFile(e.dataTransfer.files[0]);
         });
 
+        clearImageBtn.addEventListener('click', () => {
+            document.querySelector('#image-preview').innerHTML = '';
+            dropZone.querySelector('p').removeAttribute('style');
+        })
+
         function handleFile(file) {
             if (!file || !file.type.startsWith('image/')) return;
 
@@ -336,6 +343,8 @@
                 // Show preview
                 imagePreview.innerHTML = `<img src="${currentBase64Image}">`;
                 dropZone.querySelector('p').style.display = 'none';
+                // Add an option to clear the input image
+                clearImageBtn.removeAttribute('style');
             };
             reader.readAsDataURL(file);
         }
