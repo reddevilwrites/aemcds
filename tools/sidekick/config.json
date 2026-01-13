@@ -1,5 +1,6 @@
 {
   "project": "EDS Author Assistant",
+  "apiUrl": "http://localhost:4000/generate",
   "plugins": [
     {
       "id": "architect-assistant",

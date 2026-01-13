@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDS Architect Assistant</title>
+    <title>EDS Author Assistant</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -129,7 +129,7 @@
 <body>
 
     <div>
-        <h2>Architect Assistant</h2>
+        <h2>Author Assistant</h2>
         <p class="desc">Describe the block you need:</p>
     </div>
 
@@ -155,9 +155,28 @@
         /* -----------------------------------------------------------
            CONFIGURATION
            ----------------------------------------------------------- */
-        // Use your actual ngrok URL here
-        //const API_URL = 'https://hulking-zoie-revisional.ngrok-free.dev/generate'; 
-        const API_URL = 'http://localhost:4000/generate';
+        
+        const DEFAULT_API_PATH = '/generate';
+        const CONFIG_URL = new URL('config.json', window.location.href);
+        let cachedApiUrl;
+
+        async function getApiUrl() {
+            if (cachedApiUrl) return cachedApiUrl;
+            try {
+                const resp = await fetch(CONFIG_URL);
+                if (resp.ok) {
+                    const cfg = await resp.json();
+                    if (cfg && typeof cfg.apiUrl === 'string' && cfg.apiUrl.trim()) {
+                        cachedApiUrl = cfg.apiUrl.trim();
+                        return cachedApiUrl;
+                    }
+                }
+            } catch (e) {
+                // Fall back to same-origin default if config is unavailable.
+            }
+            cachedApiUrl = new URL(DEFAULT_API_PATH, window.location.origin).href;
+            return cachedApiUrl;
+        }
         const promptInput = document.getElementById('prompt-input');
         const btnGenerate = document.getElementById('btn-generate');
         const btnCopy = document.getElementById('btn-copy');
@@ -185,7 +204,8 @@
                 payload.image = currentBase64Image;
                 }
 
-                const response = await fetch(API_URL, {
+                const apiUrl = await getApiUrl();
+                const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
