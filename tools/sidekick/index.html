@@ -13,7 +13,7 @@
             --border-color: #444;
         }
 
-        /* 1. HIDE THE SIDEKICK (The Fix) */
+        /* 1. HIDE THE SIDEKICK */
         /* This hides the injected sidebar element */
         helix-sidekick, aem-sidekick {
             display: none !important;
@@ -218,10 +218,10 @@
                 preview.innerHTML = data.html;
                 if(data.html.includes('<table')) btnCopy.disabled = false;
 
-                // Clear image after success (optional)
-                // currentBase64Image = null; 
-                // imagePreview.innerHTML = '';
-                // dropZone.querySelector('p').style.display = 'block';
+                // Clear image after success
+                currentBase64Image = null; 
+                imagePreview.innerHTML = '';
+                dropZone.querySelector('p').style.display = 'block';
 
             } catch (err) {
                 console.error(err);
@@ -332,6 +332,7 @@
         clearImageBtn.addEventListener('click', () => {
             document.querySelector('#image-preview').innerHTML = '';
             dropZone.querySelector('p').removeAttribute('style');
+            clearImageBtn.style.display = 'none';
         })
 
         function handleFile(file) {
